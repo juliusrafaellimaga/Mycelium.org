@@ -1,0 +1,101 @@
+{
+  "project": {
+    "name": "Mycelium.org",
+    "tagline": "API Agent Management & Workflow Orchestration Platform",
+    "description": "A comprehensive API agent management and workflow orchestration platform designed for the Mycelium ecosystem. This project provides a modular, scalable architecture for managing distributed API agents with real-time monitoring, logging, and configuration management.",
+    "version": "1.0.0",
+    "repository": "https://github.com/juliusrafaellimaga/Mycelium.org",
+    "notion_link": "https://www.notion.so/Mycelium-Dividr-Project-349e2ad142e280d892c4d5e082bee850"
+  },
+  "features": [
+    {
+      "title": "Agent Management System",
+      "description": "Register, configure, and monitor API agents in real-time"
+    },
+    {
+      "title": "Multi-Type Agent Support",
+      "description": "Data processing, API gateway, workflow, and monitoring agents"
+    },
+    {
+      "title": "Event-Driven Architecture",
+      "description": "Emit and listen to agent lifecycle events"
+    },
+    {
+      "title": "Comprehensive Logging",
+      "description": "Detailed logging for all agent operations"
+    },
+    {
+      "title": "Metrics Collection",
+      "description": "Track request processing, errors, and performance metrics"
+    },
+    {
+      "title": "Web Dashboard",
+      "description": "Intuitive interface for agent management and monitoring"
+    },
+    {
+      "title": "MCP Integration",
+      "description": "Model Context Protocol support for extended capabilities"
+    }
+  ],
+  "agent_types": [
+    {
+      "name": "Data Processing",
+      "description": "Handle data transformation and analysis"
+    },
+    {
+      "name": "API Gateway",
+      "description": "Route and manage API requests"
+    },
+    {
+      "name": "Workflow",
+      "description": "Orchestrate multi-step workflows"
+    },
+    {
+      "name": "Monitoring",
+      "description": "Track system health and metrics"
+    }
+  ],
+  "agent_states": [
+    {
+      "state": "idle",
+      "description": "Ready but not processing"
+    },
+    {
+      "state": "active",
+      "description": "Currently processing requests"
+    },
+    {
+      "state": "error",
+      "description": "Encountered an error"
+    },
+    {
+      "state": "inactive",
+      "description": "Not running"
+    }
+  ],
+  "prerequisites": [
+    {
+      "name": "Python",
+      "version": "3.11+"
+    },
+    {
+      "name": "Node.js",
+      "version": "16+"
+    },
+    {
+      "name": "Docker",
+      "description": "for dev container"
+    }
+  ],
+  "contact": {
+    "email": "info@mycelium.org",
+    "notion_page": "https://www.notion.so/Mycelium-Dividr-Project-349e2ad142e280d892c4d5e082bee850",
+    "github": "https://github.com/juliusrafaellimaga/Mycelium.org"
+  },
+  "links": {
+    "mainWebsite": "https://mycelium.org",
+    "github": "https://github.com/juliusrafaellimaga/Mycelium.org",
+    "documentation": "/docs",
+    "api": "/api"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "environment": "development",
+    "debug": false
+  },
+  "api": {
+    "basePath": "/api",
+    "version": "v1",
+    "cors": {
+      "enabled": true,
+      "origin": "*",
+      "credentials": true
+    }
+  },
+  "database": {
+    "type": "supabase",
+    "url": "${SUPABASE_URL}",
+    "key": "${SUPABASE_KEY}",
+    "schema": "public"
+  },
+  "monitoring": {
+    "enabled": true,
+    "metricsInterval": 5000,
+    "alerting": {
+      "enabled": true,
+      "channels": ["console", "dashboard"]
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destination": "console"
+  },
+  "security": {
+    "apiKeyRequired": false,
+    "rateLimitPerMinute": 1000,
+    "enableHTTPS": false
+  }
+}

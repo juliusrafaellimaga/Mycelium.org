@@ -1,19 +1,139 @@
-// Agents.js - Agent Management Logic
+/**
+ * Agents Management System
+ * Handles API agent lifecycle, configuration, and monitoring
+ */
 
-ntName}`, `<pre>${logs}</pre>`);
+const AGENT_TYPES = {
+    DATA_PROCESSING: 'data_processing',
+    API_GATEWAY: 'api_gateway',
+    WORKFLOW: 'workflow',
+    MONITORING: 'monitoring'
+};
+
+const AGENT_STATES = {
+    IDLE: 'idle',
+    ACTIVE: 'active',
+    ERROR: 'error',
+    INACTIVE: 'inactive'
+};
+
+class AgentManager {
+    constructor() {
+        this.agents = new Map();
+        this.eventEmitter = new EventTarget();
+        this.config = {};
+    }
+
+    /**
+     * Register a new API agent
+     */
+    registerAgent(agentId, agentConfig) {
+        const agent = {
+            id: agentId,
+            name: agentConfig.name || agentId,
+            type: agentConfig.type || AGENT_TYPES.WORKFLOW,
+            state: AGENT_STATES.IDLE,
+            config: agentConfig,
+            createdAt: new Date(),
+            logs: [],
+            metrics: {
+                requestsProcessed: 0,
+                errorCount: 0,
+                avgResponseTime: 0
+            }
+        };
+
+        this.agents.set(agentId, agent);
+        this.emit('agent-registered', { agentId, agent });
+        console.log(`✓ Agent registered: ${agentId}`);
+        return agent;
+    }
+
+    /**
+     * Get agent by ID
+     */
+    getAgent(agentId) {
+        return this.agents.get(agentId);
+    }
+
+    /**
+     * Get all agents
+     */
+    getAllAgents() {
+        return Array.from(this.agents.values());
+    }
+
+    /**
+     * Update agent state
+     */
+    setAgentState(agentId, newState) {
+        const agent = this.agents.get(agentId);
+        if (agent) {
+            agent.state = newState;
+            this.emit('agent-state-changed', { agentId, state: newState });
+        }
+    }
+
+    /**
+     * Add log entry for agent
+     */
+    addLog(agentId, level, message) {
+        const agent = this.agents.get(agentId);
+        if (agent) {
+            agent.logs.push({
+                timestamp: new Date(),
+                level,
+                message
+            });
+        }
+    }
+
+    /**
+     * Get agent logs
+     */
+    getLogs(agentId, limit = 100) {
+        const agent = this.agents.get(agentId);
+        return agent ? agent.logs.slice(-limit) : [];
+    }
+
+    /**
+     * Event emission
+     */
+    emit(eventName, detail) {
+        this.eventEmitter.dispatchEvent(new CustomEvent(eventName, { detail }));
+    }
+
+    /**
+     * Event listener
+     */
+    on(eventName, callback) {
+        this.eventEmitter.addEventListener(eventName, (e) => callback(e.detail));
+    }
+
+    /**
+     * Remove event listener
+     */
+    off(eventName, callback) {
+        this.eventEmitter.removeEventListener(eventName, callback);
+    }
+
+    /**
+     * Delete agent
+     */
+    deleteAgent(agentId) {
+        const success = this.agents.delete(agentId);
+        if (success) {
+            this.emit('agent-deleted', { agentId });
+        }
+        return success;
+    }
 }
 
-function getAgentConfigForm(agentName) {
-    return `
-        <div style="color: #f1f5f9; padding: 20px;">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px;">Confidence Threshold:</label>
-                <input type="range" min="0" max="100" value="85" style="width: 100%;">
-                <span>85%</span>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px;">Processing Speed:</label>
-                <select stydocument.addEventListener('DOMContentLoaded', function() {
+// Initialize global agent manager
+const agentManager = new AgentManager();
+
+// DOM Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
     console.log('Agents page initialized');
     initializeAgentsPage();
 });
@@ -22,17 +142,15 @@ function initializeAgentsPage() {
     setupTabFiltering();
     setupAgentCardInteractions();
     setupSearch();
+    loadAgentMetrics();
 }
 
 function setupTabFiltering() {
     const tabs = document.querySelectorAll('.tab-button');
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            // Remove active class from all tabs
             tabs.forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
             this.classList.add('active');
-            
             const category = this.getAttribute('data-category');
             filterAgents(category);
         });
@@ -44,11 +162,11 @@ function filterAgents(category) {
     const cards = document.querySelectorAll('.agent-card');
     
     cards.forEach(card => {
-        if (category === 'all') {
+        const agentType = card.getAttribute('data-type');
+        if (category === 'all' || agentType === category) {
             card.style.display = 'flex';
         } else {
-            // You could add data attributes to cards for filtering
-            card.style.display = 'flex';
+            card.style.display = 'none';
         }
     });
 }
@@ -58,13 +176,13 @@ function setupAgentCardInteractions() {
     configBtns.forEach(btn => {
         if (btn.textContent.includes('Configure')) {
             btn.addEventListener('click', function() {
-                const agentName = this.closest('.agent-card').querySelector('h3').textContent;
-                configureAgent(agentName);
+                const agentId = this.closest('.agent-card').getAttribute('data-agent-id');
+                configureAgent(agentId);
             });
-        } else if (btn.textContent.includes('View Logs')) {
+        } else if (btn.textContent.includes('Logs')) {
             btn.addEventListener('click', function() {
-                const agentName = this.closest('.agent-card').querySelector('h3').textContent;
-                viewAgentLogs(agentName);
+                const agentId = this.closest('.agent-card').getAttribute('data-agent-id');
+                viewAgentLogs(agentId);
             });
         }
     });
@@ -79,7 +197,7 @@ function setupSearch() {
             
             cards.forEach(card => {
                 const agentName = card.querySelector('h3').textContent.toLowerCase();
-                const agentDesc = card.querySelector('.agent-description').textContent.toLowerCase();
+                const agentDesc = card.querySelector('.agent-description')?.textContent.toLowerCase() || '';
                 
                 if (agentName.includes(searchTerm) || agentDesc.includes(searchTerm)) {
                     card.style.display = 'flex';
@@ -91,13 +209,24 @@ function setupSearch() {
     }
 }
 
-function configureAgent(agentName) {
-    console.log('Configuring agent:', agentName);
-    showModal(`Configure ${agentName}`, getAgentConfigForm(agentName));
+function configureAgent(agentId) {
+    console.log('Configuring agent:', agentId);
+    const agent = agentManager.getAgent(agentId);
+    if (agent) {
+        alert(`Configure ${agent.name}`);
+    }
 }
 
-function viewAgentLogs(agentName) {
-    console.log('Viewing logs for:', agentName);
+function viewAgentLogs(agentId) {
+    console.log('Viewing logs for:', agentId);
+    const logs = agentManager.getLogs(agentId);
+    console.table(logs);
+}
+
+function loadAgentMetrics() {
+    const agents = agentManager.getAllAgents();
+    console.log('Current agents:', agents);
+}
     const logs = generateMockLogs(agentName);
     showModal(`Logs - ${agele="width: 100%; padding: 8px; background-color: #334155; color: #f1f5f9; border: 1px solid #475569; border-radius: 6px;">
                     <option>Real-time</option>

@@ -1,0 +1,46 @@
+{
+  "agents": {
+    "data-processor-1": {
+      "type": "data_processing",
+      "name": "Primary Data Processor",
+      "enabled": true,
+      "config": {
+        "batchSize": 100,
+        "processingTimeout": 5000,
+        "retryAttempts": 3
+      }
+    },
+    "api-gateway-1": {
+      "type": "api_gateway",
+      "name": "Main API Gateway",
+      "enabled": true,
+      "config": {
+        "port": 3000,
+        "timeout": 30000,
+        "maxRetries": 3,
+        "rateLimit": 1000
+      }
+    },
+    "monitor-1": {
+      "type": "monitoring",
+      "name": "System Monitor",
+      "enabled": true,
+      "config": {
+        "checkInterval": 5000,
+        "alertThreshold": 80,
+        "memoryLimit": 500
+      }
+    }
+  },
+  "features": {
+    "enableMetrics": true,
+    "enableLogging": true,
+    "enableAlerts": true,
+    "enableAutoRecovery": true
+  },
+  "defaults": {
+    "logLevel": "info",
+    "maxLogs": 1000,
+    "metricsInterval": 5000
+  }
+}
